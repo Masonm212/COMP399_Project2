@@ -1,30 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SkellyMove : MonoBehaviour
 {
     public Animator anim;
+    public NavMeshAgent navAgent;
+    public Transform[] points;
+    private int pointCount;
     // Start is called before the first frame update
     void Start()
     {
-        
+        int rand = Random.Range(0, points.Length);
+        navAgent.SetDestination(points[rand].position);
+        anim.SetTrigger("Walk");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.W)) 
+        if(navAgent.remainingDistance <= navAgent.stoppingDistance)
         {
-            anim.SetTrigger("Walk");
+            int rand = Random.Range(0, points.Length);
+            navAgent.SetDestination(points[rand].position);
+            ++pointCount;
+            Debug.Log("Arrived!" + pointCount);
         }
-        if(Input.GetKeyDown(KeyCode.R))
+        if(pointCount == 5 && !navAgent.isStopped)
         {
-            anim.SetTrigger("Run");
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            anim.SetTrigger("Dead");
+            navAgent.isStopped = true;
+            anim.SetTrigger("Idle");
         }
     }
 }
